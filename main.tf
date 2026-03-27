@@ -166,7 +166,7 @@ resource "google_compute_instance" "this" {
   }
 
   service_account {
-    email  = "default"
+    email = "default"
     scopes = [
       "https://www.googleapis.com/auth/cloud.useraccounts.readonly",
       "https://www.googleapis.com/auth/devstorage.read_only",
