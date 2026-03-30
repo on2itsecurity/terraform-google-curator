@@ -20,7 +20,7 @@ module "curator" {
   auth_code  = var.auth_code
 }
 ```
-
+p
 ## Requirements
 
 | Name                 | Version  |
@@ -30,23 +30,23 @@ module "curator" {
 
 ## Inputs
 
-| Name               | Description                                                        | Type           | Default                                                      | Required |
-| ------------------ | ------------------------------------------------------------------ | -------------- | ------------------------------------------------------------ | -------- |
-| project_id         | GCP project ID for deployment                                      | `string`       | n/a                                                          | **yes**  |
-| auth_code          | Curator auth code from the AUXO Portal                             | `string`       | n/a                                                          | **yes**  |
-| region             | GCP region for deployment                                          | `string`       | `"europe-west4"`                                             | no       |
-| zone               | GCP zone for the Curator VM                                        | `string`       | `"europe-west4-a"`                                           | no       |
-| labels             | Map of labels applied to all resources                             | `map(string)`  | `{}`                                                         | no       |
-| vpc_name           | Name of the VPC network                                            | `string`       | `"vpc-curator"`                                              | no       |
-| subnet_name        | Name of the subnet                                                 | `string`       | `"sn-curator"`                                               | no       |
-| subnet_range       | IP CIDR range for the subnet                                       | `string`       | `"10.10.1.0/24"`                                             | no       |
-| vm_name            | Name of the Curator compute instance                               | `string`       | `"vm-curator"`                                               | no       |
-| machine_type       | GCP machine type for the Curator instance                          | `string`       | `"e2-standard-4"`                                            | no       |
-| private_ip_address | Static private IP address for the VM                               | `string`       | `"10.10.1.10"`                                               | no       |
-| disk_size_gb       | Boot disk size in GB                                               | `number`       | `50`                                                         | no       |
-| disk_type          | Boot disk type (pd-ssd, pd-balanced, pd-standard)                  | `string`       | `"pd-ssd"`                                                   | no       |
-| firewall_allow_ips | Additional IP ranges allowed inbound (ON2IT range always included) | `list(string)` | `[]`                                                         | no       |
-| image              | Source image for the Curator VM                                    | `string`       | `"projects/on2it-public/global/images/family/curator-family"`  | no       |
+| Name                    | Description                                                                         | Type           | Default            | Required |
+| ----------------------- | ----------------------------------------------------------------------------------- | -------------- | ------------------ | -------- |
+| project_id              | GCP project ID for deployment                                                       | `string`       | n/a                | **yes**  |
+| auth_code               | Curator auth code from the AUXO Portal                                              | `string`       | n/a                | **yes**  |
+| region                  | GCP region for deployment                                                           | `string`       | `"europe-west4"`   | no       |
+| zone                    | GCP zone for the Curator VM                                                         | `string`       | `"europe-west4-a"` | no       |
+| labels                  | Map of labels applied to all resources                                              | `map(string)`  | `{}`               | no       |
+| vpc_name                | Name of the VPC network                                                             | `string`       | `"vpc-curator"`    | no       |
+| subnet_name             | Name of the subnet                                                                  | `string`       | `"sn-curator"`     | no       |
+| subnet_range            | IP CIDR range for the subnet                                                        | `string`       | `"10.10.1.0/24"`   | no       |
+| vm_name                 | Name of the Curator compute instance                                                | `string`       | `"vm-curator"`     | no       |
+| machine_type            | GCP machine type for the Curator instance                                           | `string`       | `"e2-standard-4"`  | no       |
+| private_ip_address      | Static private IP address for the VM                                                | `string`       | `"10.10.1.10"`     | no       |
+| disk_size_gb            | Boot disk size in GB                                                                | `number`       | `50`               | no       |
+| disk_type               | Boot disk type (pd-ssd, pd-balanced, pd-standard)                                   | `string`       | `"pd-ssd"`         | no       |
+| firewall_allow_ips      | Additional IP ranges allowed inbound (ON2IT range always included)                  | `list(string)` | `[]`               | no       |
+| enable_outbound_storage | Create a private DNS zone to route storage.googleapis.com via Private Google Access | `bool`         | `true`             | no       |
 
 ## Outputs
 
@@ -68,11 +68,12 @@ The module creates hardened firewall rules with least-privilege outbound access:
 - **HTTPS** (TCP 443) to AUXO platform (185.46.232.0/22)
 - **NATS** (TCP 4222) to AUXO platform (185.46.232.0/22)
 - **Google APIs** (TCP 443) via Private Google Access ranges
+- **Google Cloud Storage** (TCP 443) via private DNS zone routing `storage.googleapis.com` to Private Google Access (enabled by default, controlled by `enable_outbound_storage`)
 - **Deny all** other outbound traffic
 
 The ON2IT platform range (185.46.232.0/22) is always included in the inbound allow rule. Additional IP ranges can be added via `firewall_allow_ips`.
 
-Private Google Access is enabled on the subnet, allowing the VM to reach Google Cloud Storage and other Google APIs without traversing the public internet.
+Private Google Access is enabled on the subnet. When `enable_outbound_storage` is enabled (default), a private Cloud DNS zone is created to resolve `storage.googleapis.com` to the Private Google Access IPs (199.36.153.8/30), ensuring traffic reaches Google Cloud Storage over Google's internal network rather than the public internet.
 
 ## Examples
 

@@ -110,6 +110,32 @@ resource "google_compute_firewall" "allow_google_apis" {
   }
 }
 
+# DNS -- Route storage.googleapis.com via Private Google Access
+resource "google_dns_managed_zone" "storage_googleapis" {
+  count       = var.enable_outbound_storage ? 1 : 0
+  name        = format("%s-%s", var.vm_name, "storage-googleapis")
+  dns_name    = "storage.googleapis.com."
+  project     = var.project_id
+  description = "Route storage.googleapis.com via Private Google Access"
+  visibility  = "private"
+
+  private_visibility_config {
+    networks {
+      network_url = google_compute_network.this.id
+    }
+  }
+}
+
+resource "google_dns_record_set" "storage_googleapis" {
+  count        = var.enable_outbound_storage ? 1 : 0
+  name         = "storage.googleapis.com."
+  managed_zone = google_dns_managed_zone.storage_googleapis[0].name
+  project      = var.project_id
+  type         = "A"
+  ttl          = 300
+  rrdatas      = ["199.36.153.8", "199.36.153.9", "199.36.153.10", "199.36.153.11"]
+}
+
 # Firewall -- Deny All Outbound
 resource "google_compute_firewall" "deny_all_outbound" {
   name               = format("%s-%s", var.vm_name, "deny-all-outbound")
@@ -144,7 +170,7 @@ resource "google_compute_instance" "this" {
 
   boot_disk {
     initialize_params {
-      image = var.image
+      image = "projects/on2it-public/global/images/family/curator-family"
       size  = var.disk_size_gb
       type  = var.disk_type
     }
