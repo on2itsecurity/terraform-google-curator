@@ -86,8 +86,8 @@ variable "auth_code" {
   sensitive   = true
 }
 
-variable "image" {
-  description = "Source image for the Curator VM (projects/PROJECT/global/images/family/FAMILY format)"
-  type        = string
-  default     = "projects/on2it-public/global/images/family/curator-family"
+variable "enable_outbound_storage" {
+  description = "Create a private DNS zone to route storage.googleapis.com via Private Google Access (199.36.153.8/30)"
+  type        = bool
+  default     = true
 }
