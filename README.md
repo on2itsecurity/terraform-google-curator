@@ -77,8 +77,8 @@ Private Google Access is enabled on the subnet. When `enable_outbound_storage` i
 
 ## Examples
 
-- [Basic](./examples/basic) -- Minimal deployment with required variables only
-- [Complete](./examples/complete) -- Full deployment with all options
+- [Basic](https://github.com/on2itsecurity/terraform-google-curator/tree/main/examples/basic) -- Minimal deployment with required variables only
+- [Complete](https://github.com/on2itsecurity/terraform-google-curator/tree/main/examples/complete) -- Full deployment with all options
 
 ## License
 
